@@ -1,97 +1,91 @@
 import appdaemon.plugins.hass.hassapi as hass
-from datetime import datetime, timedelta
 
 class EnergyOptimizer(hass.Hass):
-
     def initialize(self):
-        self.period = int(self.args.get("optimization_period", 300))
-        self.batt_curr = int(self.args.get("battery_charge_current", 25))
+        # Load config options from apps.yaml
+        self.period = int(self.args.get("optimization_period", 300))  # default 5 min
+        self.battery_charge_current = int(self.args.get("battery_charge_current", 25))
         self.min_soc = int(self.args.get("min_soc", 80))
-        self.opt_soc = int(self.args.get("opt_soc", 100))
-        self.min_bt = int(self.args.get("min_boiler_temp", 55))
-        self.opt_bt = int(self.args.get("opt_boiler_temp", 70))
-        self.min_price = float(self.args.get("min_spot_price", 300))
-        self.min_grid_soc = int(self.args.get("min_grid_charge_soc", 20))
+        self.target_soc = int(self.args.get("target_soc", 100))
+        self.boiler_temp_min = int(self.args.get("boiler_temp_min", 55))
+        self.boiler_temp_opt = int(self.args.get("boiler_temp_optimal", 70))
+        self.min_spot_price = float(self.args.get("min_spot_price", 300))
 
-        self.log("Energy Optimizer initialized with period={}s".format(self.period))
-        self.run_every(self.optimize_cycle, "now", self.period)
+        self.log("Energy Optimizer initialized with settings: {}".format(self.args))
 
-    # --- Helpers
-    def _f(self, v, d=0.0):
+        # Run periodically
+        self.run_every(self.optimize_energy, "now", self.period)
+
+    def optimize_energy(self, kwargs):
         try:
-            return float(v)
-        except:
-            return d
+            soc = float(self.get_state("sensor.solax_battery_capacity") or 0)
+            pv_power = float(self.get_state("sensor.solax_pv_power_total") or 0)
+            house_load = float(self.get_state("sensor.solax_house_load") or 0)
+            spot_price = float(self.get_state("sensor.current_spot_electricity_price") or 0)
+            boiler_temp = float(self.get_state("sensor.boiler_temp") or 0)
 
-    def _state(self, entity, d=None):
-        s = self.get_state(entity)
-        if s is None or s == "unknown" or s == "unavailable":
-            return d
-        return s
+            self.log(f"SoC={soc}%, PV={pv_power}W, Load={house_load}W, Spot={spot_price}, Boiler={boiler_temp}°C")
 
-    def _number_set(self, entity, value):
-        self.call_service("number/set_value", entity_id=entity, value=value)
+            surplus = pv_power - house_load
+            if surplus < 0:
+                surplus = 0
 
-    def _switch(self, entity, on):
-        self.call_service(f"switch/turn_{'on' if on else 'off'}", entity_id=entity)
-
-    # --- Main control loop
-    def optimize_cycle(self, kwargs):
-        try:
-            soc = self._f(self._state("sensor.solax_battery_capacity"))
-            batt_v = self._f(self._state("sensor.solax_battery_voltage_charge"), 240.0)
-            boiler_t = self._f(self._state("sensor.boiler_temp"))
-            pv_now = self._f(self._state("sensor.solax_pv_power_total"))
-            house = self._f(self._state("sensor.solax_house_load"))
-            spot = self._f(self._state("sensor.current_spot_electricity_price"))
-            surplus = max(0.0, pv_now - house)
-
-            # Boiler staged control (0/800/1600)
-            if boiler_t < self.min_bt:
-                # heat aggressively if we have surplus; if not, allow grid but stop at 55-60C
-                if surplus >= 1600:
-                    self._switch("switch.boiler_relay_1", True)
-                    self._switch("switch.boiler_relay_2", True)
-                elif surplus >= 800:
-                    self._switch("switch.boiler_relay_1", True)
-                    self._switch("switch.boiler_relay_2", False)
-                else:
-                    # not enough PV - allow grid only until ~55C
-                    if boiler_t < 55:
-                        self._switch("switch.boiler_relay_1", True)
-                        self._switch("switch.boiler_relay_2", False)
-                    else:
-                        self._switch("switch.boiler_relay_1", False)
-                        self._switch("switch.boiler_relay_2", False)
-            elif boiler_t < self.opt_bt:
-                if surplus >= 800 and spot < self.min_price:
-                    self._switch("switch.boiler_relay_1", True)
-                    self._switch("switch.boiler_relay_2", surplus >= 1600)
-                else:
-                    self._switch("switch.boiler_relay_1", False)
-                    self._switch("switch.boiler_relay_2", False)
+            # --- Battery control ---
+            if soc < self.min_soc:
+                # Always charge battery until minimum SoC
+                self.call_service("number/set_value",
+                                  entity_id="number.solax_battery_charge_max_current",
+                                  value=self.battery_charge_current)
+                self.log("Battery below min SoC → charging.")
+            elif soc < self.target_soc and surplus > 0:
+                self.call_service("number/set_value",
+                                  entity_id="number.solax_battery_charge_max_current",
+                                  value=self.battery_charge_current)
+                self.log("Battery charging towards target SoC.")
             else:
-                self._switch("switch.boiler_relay_1", False)
-                self._switch("switch.boiler_relay_2", False)
+                self.call_service("number/set_value",
+                                  entity_id="number.solax_battery_charge_max_current",
+                                  value=0)
+                self.log("Battery charging paused (target SoC reached or no surplus).")
 
-            # Battery charging current (0–25A). No grid arbitrage; keep self-consumption.
-            target_current = 0
-            if soc < self.opt_soc and surplus > 0:
-                # I = P/V; clamp to configured max
-                target_current = min(self.batt_curr, int(surplus / max(batt_v,1) * 1000))
-            elif soc < self.min_grid_soc:
-                # emergency: allow small grid charge to 20% to protect battery
-                target_current = min(5, self.batt_curr)
-            self._number_set("number.solax_battery_charge_max_current", target_current)
+            # --- Boiler control ---
+            if boiler_temp < self.boiler_temp_min and surplus >= 800:
+                self.turn_on("switch.boiler_relay_1")
+                if surplus >= 1600:
+                    self.turn_on("switch.boiler_relay_2")
+                else:
+                    self.turn_off("switch.boiler_relay_2")
+                self.log("Boiler heating (below min).")
+            elif boiler_temp < self.boiler_temp_opt and surplus >= 800:
+                self.turn_on("switch.boiler_relay_1")
+                if surplus >= 1600:
+                    self.turn_on("switch.boiler_relay_2")
+                else:
+                    self.turn_off("switch.boiler_relay_2")
+                self.log("Boiler heating (towards optimal).")
+            else:
+                self.turn_off("switch.boiler_relay_1")
+                self.turn_off("switch.boiler_relay_2")
+                self.log("Boiler heating off (temperature reached).")
 
-            # Grid export control – only when price high and we have surplus after needs
-            export_limit = 0
-            if soc >= self.min_soc and spot >= self.min_price and surplus > 0:
-                export_limit = int(surplus)
-            self._number_set("number.solax_export_control_user_limit", export_limit)
-
-            self.log(f"SoC={soc:.1f}% PV={pv_now:.0f}W Load={house:.0f}W Surplus={surplus:.0f}W Spot={spot:.1f} "
-                     f"Boiler={boiler_t:.1f}C Ibat={target_current}A Export={export_limit}W")
+            # --- Grid export control ---
+            if surplus > 0:
+                if spot_price >= self.min_spot_price:
+                    limit = min(int(surplus), 12200)
+                    self.call_service("number/set_value",
+                                      entity_id="number.solax_export_control_user_limit",
+                                      value=limit)
+                    self.log(f"Exporting {limit} W to grid (spot price OK).")
+                else:
+                    self.call_service("number/set_value",
+                                      entity_id="number.solax_export_control_user_limit",
+                                      value=0)
+                    self.log("Spot price too low → no grid export.")
+            else:
+                self.call_service("number/set_value",
+                                  entity_id="number.solax_export_control_user_limit",
+                                  value=0)
+                self.log("No surplus → no grid export.")
 
         except Exception as e:
-            self.log(f"Optimization error: {e}", level="ERROR")
+            self.error(f"Error in optimization: {e}")
