@@ -1,5 +1,3 @@
-# appdaemon.yaml
-
 appdaemon:
   time_zone: Europe/Prague
   plugins:
