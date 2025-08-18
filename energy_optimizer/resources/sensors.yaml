@@ -1,0 +1,14 @@
+# Import this file into your Home Assistant configuration (e.g. via !include in configuration.yaml)
+# Creates template sensors for plan vs actual comparison.
+template:
+  - sensor:
+      - name: planned_export_kwh
+        unique_id: planned_export_kwh
+        unit_of_measurement: "kWh"
+        state: "{{ state_attr('sensor.export_plan', 'today_total') | default(0) }}"
+      - name: planned_vs_actual_export_kwh
+        unique_id: planned_vs_actual_export_kwh
+        unit_of_measurement: "kWh"
+        state: >
+          {{ (states('sensor.planned_export_kwh') | float(0)) -
+             (states('sensor.solax_today_s_export_energy') | float(0)) }}

@@ -1,0 +1,36 @@
+name: Energy Optimizer
+version: "1.0.0"
+slug: energy_optimizer
+description: "Optimize battery, boiler and grid export using Solcast and OTE prices (AppDaemon)."
+url: "https://github.com/YOUR_GITHUB_USERNAME/ha-energy-optimizer"
+arch:
+  - amd64
+  - aarch64
+  - armv7
+  - armhf
+startup: application
+boot: auto
+init: false
+map:
+  - config:rw
+  - share:rw
+options:
+  optimization_period: 300
+  battery_charge_current: 25
+  min_soc: 80
+  opt_soc: 100
+  min_boiler_temp: 55
+  opt_boiler_temp: 70
+  min_spot_price: 300
+  min_grid_charge_soc: 20
+  timezone: Europe/Prague
+schema:
+  optimization_period: int
+  battery_charge_current: int
+  min_soc: int
+  opt_soc: int
+  min_boiler_temp: int
+  opt_boiler_temp: int
+  min_spot_price: int
+  min_grid_charge_soc: int
+  timezone: str
