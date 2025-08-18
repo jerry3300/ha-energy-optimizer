@@ -1,11 +1,11 @@
+secrets: /config/secrets.yaml
 appdaemon:
   time_zone: Europe/Prague
-  latitude: 50.0755
-  longitude: 14.4378
-  elevation: 200
-
   plugins:
     HASS:
       type: hass
-      ha_url: "http://supervisor/core"
-      token: "YOUR_LONG_LIVED_ACCESS_TOKEN"
+      ha_url: http://supervisor/core
+      token: YOUR_LONG_LIVED_ACCESS_TOKEN
+  latitude: 50.08804    # example for Prague
+  longitude: 14.42076   # example for Prague
+  elevation: 200        # approximate elevation in meters
