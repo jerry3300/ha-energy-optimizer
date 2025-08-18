@@ -15,13 +15,18 @@ if [ -f "$OPTS_FILE" ]; then
   MIN_PRICE=$(jq -r '.min_spot_price // 300' "$OPTS_FILE")
   GRID_SOC=$(jq -r '.min_grid_charge_soc // 20' "$OPTS_FILE")
   TZSTR=$(jq -r '.timezone // "UTC"' "$OPTS_FILE")
+  LAT=$(jq -r '.latitude // 50.08804' "$OPTS_FILE")
+  LON=$(jq -r '.longitude // 14.42076' "$OPTS_FILE")
+  ELEV=$(jq -r '.elevation // 200' "$OPTS_FILE")
 else
   echo "[WARN] No options.json found, using defaults"
-  PERIOD=300; BATT_CURR=25; MIN_SOC=80; OPT_SOC=100; MIN_BT=55; OPT_BT=70; MIN_PRICE=300; GRID_SOC=20; TZSTR="UTC"
+  PERIOD=300; BATT_CURR=25; MIN_SOC=80; OPT_SOC=100; MIN_BT=55; OPT_BT=70; MIN_PRICE=300; GRID_SOC=20
+  TZSTR="UTC"; LAT=50.08804; LON=14.42076; ELEV=200
 fi
 
 export TZ="$TZSTR"
 echo "[INFO] Time zone: $TZ"
+echo "[INFO] Location: lat=$LAT, lon=$LON, elev=$ELEV"
 
 # Prepare AppDaemon config
 mkdir -p /config/energy_optimizer
@@ -31,6 +36,9 @@ mkdir -p /app/config
 cat > /app/config/appdaemon.yaml <<EOF
 appdaemon:
   time_zone: "${TZ}"
+  latitude: ${LAT}
+  longitude: ${LON}
+  elevation: ${ELEV}
   plugins:
     HASS:
       type: hass
