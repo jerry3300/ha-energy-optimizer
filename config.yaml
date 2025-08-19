@@ -1,7 +1,7 @@
 name: "Energy Optimizer"
 version: "1.0.0"
 slug: ha_energy_optimizer
-description: "Predictive energy management for optimal self-consumption and grid export."
+description: Predictive energy management for optimal self-consumption and grid export.
 arch:
   - aarch64
   - amd64
