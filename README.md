@@ -1,17 +1,15 @@
-# Home Energy Optimizer Add-on
+# Home Energy Optimizer (AppDaemon)
 
-This Home Assistant add-on provides predictive energy management for your Solax battery, PV, and boiler.
+This repository provides a Home Assistant **add-on** that bundles AppDaemon and a custom optimizer app for **Solax X3-Hybrid-G4**, **Solcast forecasts**, and **OTE spot prices**.
 
 ## Features
-- Predicts home load using historical consumption
-- Optimizes battery and boiler scheduling
-- Sunrise/sunset-aware PV surplus usage
-- Maximizes revenue and self-consumption
+- Predictive scheduler (15-min slots)
+- Ensures minimum battery SoC (≥ 80%) and boiler temperature (≥ 60 °C) by sunset
+- Maximizes export at high spot prices
+- Respects inverter **Self Use Mode** (no battery-to-grid arbitrage)
+- Grid import guard
+- Historical weekday/weekend load profile
 
 ## Installation
-1. Add the repository to Home Assistant Add-on Store.
-2. Install the add-on.
-3. Configure AppDaemon integration with your Home Assistant.
-
-## Configuration
-Edit `config.yaml` to customize battery, boiler, and optimization parameters.
+1. In Home Assistant → **Settings → Add-ons → Add-on Store**.  
+2. Click **⋮ → Repositories** and add:  
