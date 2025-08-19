@@ -30,3 +30,4 @@ RUN chmod +x run.sh
 
 # Default command
 CMD ["./run.sh"]
+
