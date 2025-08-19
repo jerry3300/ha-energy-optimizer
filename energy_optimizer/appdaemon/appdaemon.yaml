@@ -1,0 +1,16 @@
+appdaemon:
+  time_zone: Europe/Prague
+  latitude: 49.95
+  longitude: 14.55
+  elevation: 300
+  plugins:
+    HASS:
+      type: hass
+      ha_url: http://supervisor/core
+      token: !secret ha_token
+
+logs:
+  main_log:
+    filename: /config/appdaemon/logs/appdaemon.log
+  error_log:
+    filename: /config/appdaemon/logs/error.log
