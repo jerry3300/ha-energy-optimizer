@@ -1,28 +1,23 @@
-# Use official Home Assistant add-on base image (updated)
-FROM ghcr.io/home-assistant/amd64-addon-base:18
-
-# Set build arguments
-ARG BUILD_FROM=ghcr.io/home-assistant/amd64-addon-base:18
-ARG BUILD_ARCH=amd64
+# Use official Python slim image to avoid GHCR auth issues
+FROM python:3.12-slim
 
 # Set working directory
 WORKDIR /app
 
-# Install dependencies (AppDaemon + Python packages)
-RUN apk add --no-cache \
-    python3 \
-    py3-pip \
-    bash \
-    curl \
-    && pip3 install --upgrade pip \
-    && pip3 install appdaemon requests pyyaml
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    bash curl \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copy local files
+# Install AppDaemon and required Python libraries
+RUN pip install --no-cache-dir appdaemon requests pyyaml
+
+# Copy add-on files
 COPY run.sh /run.sh
 COPY appdaemon/ /app/appdaemon/
 
-# Ensure run.sh is executable
+# Make run.sh executable
 RUN chmod a+x /run.sh
 
 # Set default command
-CMD [ "/run.sh" ]
+CMD ["/run.sh"]
