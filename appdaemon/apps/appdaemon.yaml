@@ -1,0 +1,15 @@
+logs:
+  main_log:
+    filename: /config/appdaemon.log
+appdaemon:
+  latitude: 50.088
+  longitude: 14.4208
+  elevation: 200
+  time_zone: Europe/Prague
+  plugins:
+    HASS:
+      type: hass
+apps:
+  home_energy_optimizer:
+    module: home_energy_optimizer
+    class: HomeEnergyOptimizer
