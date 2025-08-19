@@ -1,7 +1,6 @@
-# Use slim Python 3.11 image
 FROM python:3.11-slim
 
-# Install dependencies
+# Install OS dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         build-essential git curl bash libffi-dev tzdata && \
@@ -14,14 +13,18 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Set working directory
 WORKDIR /app
 
-# Copy script and main code
+# Copy mandatory files
 COPY run.sh .
-COPY energy_optimizer/ ./energy_optimizer/
 COPY config.yaml .
+
+# Copy energy_optimizer if it exists
+RUN mkdir -p energy_optimizer && \
+    if [ -d "./energy_optimizer" ]; then \
+        cp -r ./energy_optimizer/* energy_optimizer/; \
+    fi
 
 # Make script executable
 RUN chmod +x run.sh
 
-# Run the script by default
 CMD ["./run.sh"]
 
