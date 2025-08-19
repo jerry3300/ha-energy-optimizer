@@ -1,0 +1,66 @@
+
+---
+
+### 3. `energy_optimizer/config.yaml`
+```yaml
+name: Home Energy Optimizer (AppDaemon)
+version: "0.1.0"
+slug: energy_optimizer
+description: AppDaemon-based optimizer for Solax hybrid inverter + Solcast + OTE spot prices.
+arch:
+  - aarch64
+  - amd64
+  - armv7
+startup: application
+boot: auto
+homeassistant_api: true
+ingress: false
+host_network: true
+options:
+  slot_minutes: 15
+  battery_capacity_kwh: 12
+  boiler_liters: 120
+  min_soc: 80
+  opt_soc: 100
+  min_boiler_temp: 55
+  opt_boiler_temp: 70
+  min_export_price: 300
+  max_grid_import_w: 100
+  battery_charge_current: 25
+  entities:
+    battery_soc: sensor.solax_battery_capacity
+    grid_import: sensor.solax_grid_import
+    export_limit: number.solax_export_control_user_limit
+    batt_charge_limit: number.solax_battery_charge_max_current
+    boiler_temp: sensor.boiler_temp
+    boiler_relay_1: switch.boiler_relay_1
+    boiler_relay_2: switch.boiler_relay_2
+    solcast_today: sensor.solcast_pv_forecast_forecast_today
+    solcast_tomorrow: sensor.solcast_pv_forecast_forecast_tomorrow
+    spot_price: sensor.current_spot_electricity_price
+    sun: sun.sun
+schema:
+  slot_minutes: int(5,60)?
+  battery_capacity_kwh: float(1,100)?
+  boiler_liters: int(50,500)?
+  min_soc: int(0,100)?
+  opt_soc: int(0,100)?
+  min_boiler_temp: int(30,80)?
+  opt_boiler_temp: int(30,80)?
+  min_export_price: float(0,10000)?
+  max_grid_import_w: int(0,5000)?
+  battery_charge_current: int(0,25)?
+  entities:
+    battery_soc: str
+    grid_import: str
+    export_limit: str
+    batt_charge_limit: str
+    boiler_temp: str
+    boiler_relay_1: str
+    boiler_relay_2: str
+    solcast_today: str
+    solcast_tomorrow: str
+    spot_price: str
+    sun: str
+init: false
+image: null
