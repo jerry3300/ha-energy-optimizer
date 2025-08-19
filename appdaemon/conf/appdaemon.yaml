@@ -1,0 +1,15 @@
+appdaemon:
+  latitude: 49.8978      # Zvole near Prague
+  longitude: 14.9880
+  elevation: 400
+  time_zone: Europe/Prague
+  plugins:
+    HASS:
+      type: hass
+      ha_url: http://supervisor/core
+      token: YOUR_LONG_LIVED_ACCESS_TOKEN  # replace with HA token
+http:
+  url: http://0.0.0.0:5050
+admin:
+api:
+hadashboard:
