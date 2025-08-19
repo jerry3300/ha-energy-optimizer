@@ -1,4 +1,8 @@
-#!/usr/bin/with-contenv bashio
+#!/usr/bin/env bash
+set -e
+
+# Optional: print start message
+echo "Starting Home Energy Optimizer add-on..."
+
 # Start AppDaemon
-echo "Starting Home Energy Optimizer..."
-exec appdaemon -c /appdaemon
+exec appdaemon -c /app/appdaemon/conf
