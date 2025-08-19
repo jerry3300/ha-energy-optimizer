@@ -29,3 +29,13 @@ schema:
   min_spot_price: int
   max_export_limit: int
   history_days: int
+
+# Map the AppDaemon configuration folder
+map:
+  config: appdaemon/conf
+
+# Image to use for the add-on container
+image: ghcr.io/home-assistant/amd64-addon-base:18
+
+# This add-on does not expose a web UI
+webui: false
