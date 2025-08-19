@@ -1,9 +1,0 @@
-{
-  "name": "Home Energy Optimizer",
-  "description": "Predictive battery and boiler scheduler",
-  "url": "https://github.com/yourusername/home-energy-optimizer",
-  "version": "1.0",
-  "slug": "home_energy_optimizer",
-  "startup": "services",
-  "boot": "auto"
-}
