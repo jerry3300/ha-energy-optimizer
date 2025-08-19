@@ -1,16 +1,20 @@
-ARG BUILD_FROM=ghcr.io/hassio-addons/base:14.2.3
-FROM ${BUILD_FROM}
+# Use the official Home Assistant base image
+FROM ghcr.io/home-assistant/amd64-base:latest
 
-# Install Python + AppDaemon
-RUN apk add --no-cache python3 py3-pip tzdata && \
-    pip3 install --no-cache-dir appdaemon==4.4.2 pytz
+# Install system packages
+RUN apk add --no-cache python3 py3-pip tzdata
 
-# Copy our AppDaemon config and apps
-COPY appdaemon /config/appdaemon/
+# Create a virtual environment for AppDaemon
+RUN python3 -m venv /opt/venv \
+    && /opt/venv/bin/pip install --upgrade pip \
+    && /opt/venv/bin/pip install appdaemon==4.4.2 pytz
 
-# Copy run script
-COPY run.sh /
-RUN chmod a+x /run.sh
+# Add virtual environment to PATH so python and pip point to it
+ENV PATH="/opt/venv/bin:$PATH"
 
-# S6 overlay entrypoint
+# Copy add-on files (adjust source folder if needed)
+COPY run.sh /run.sh
+RUN chmod +x /run.sh
+
+# Set the default command
 CMD [ "/run.sh" ]
