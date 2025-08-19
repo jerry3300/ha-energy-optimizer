@@ -1,38 +1,32 @@
-# Use Python 3.12 slim base image
-FROM python:3.12-slim
+# Use Python 3.13 slim image
+FROM python:3.13-slim
 
 # Set environment variables
-ENV LANG=C.UTF-8 \
-    PYTHONUNBUFFERED=1 \
-    DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    LANG=C.UTF-8
 
 # Install system dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        build-essential \
-        git \
-        curl \
-        bash \
-        libffi-dev \
-        tzdata && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libffi-dev \
+    libssl-dev \
+    libjpeg-dev \
+    zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip and install required Python packages
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir \
-        homeassistant==2025.8 \
-        requests \
-        pytz \
-        numpy \
-        pandas
+# Upgrade pip
+RUN pip install --upgrade pip
+
+# Install Home Assistant and any additional packages
+RUN pip install homeassistant==2025.8 requests pytz numpy pandas
 
 # Set working directory
-WORKDIR /app
+WORKDIR /config
 
-# Copy your add-on files (adjust if your add-on has more files)
-COPY . /app
+# Expose Home Assistant default port
+EXPOSE 8123
 
-# Set entrypoint or command for the add-on (adjust as needed)
-CMD ["python", "main.py"]
-
+# Run Home Assistant
+CMD ["hass", "--config", "/config"]
 
