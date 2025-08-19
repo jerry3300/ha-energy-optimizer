@@ -1,0 +1,31 @@
+name: Home Energy Optimizer
+version: "1.0"
+slug: home_energy_optimizer
+description: "Predictive battery and boiler scheduler for Home Assistant"
+arch:
+  - amd64
+  - armv7
+  - aarch64
+startup: "services"
+boot: "auto"
+ports: {}
+options:
+  optimization_interval: 15
+  battery_max_current: 25
+  battery_min_soc: 80
+  battery_opt_soc: 100
+  boiler_min_temp: 55
+  boiler_opt_temp: 70
+  min_spot_price: 300
+  max_export_limit: 12200
+  history_days: 28
+schema:
+  optimization_interval: int
+  battery_max_current: int
+  battery_min_soc: int
+  battery_opt_soc: int
+  boiler_min_temp: int
+  boiler_opt_temp: int
+  min_spot_price: int
+  max_export_limit: int
+  history_days: int
