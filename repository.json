@@ -1,47 +1,5 @@
 {
-  "name": "HA Energy Optimizer",
-  "url": "https://github.com/YOUR_GITHUB_USERNAME/ha-energy-optimizer",
-  "maintainer": "Your Name <your@email.com>",
-  "add-ons": {
-    "energy_optimizer": {
-      "name": "Energy Optimizer",
-      "description": "Optimize energy production and consumption for Solax inverter + boiler with spot prices (AppDaemon-based).",
-      "slug": "energy_optimizer",
-      "version": "1.0.0",
-      "arch": [
-        "amd64",
-        "aarch64",
-        "armv7",
-        "armhf"
-      ],
-      "startup": "application",
-      "boot": "auto",
-      "map": [
-        "config:rw",
-        "share:rw"
-      ],
-      "options": {
-        "optimization_period": 300,
-        "battery_charge_current": 25,
-        "min_soc": 80,
-        "opt_soc": 100,
-        "min_boiler_temp": 55,
-        "opt_boiler_temp": 70,
-        "min_spot_price": 300,
-        "min_grid_charge_soc": 20,
-        "timezone": "Europe/Prague"
-      },
-      "schema": {
-        "optimization_period": "int",
-        "battery_charge_current": "int",
-        "min_soc": "int",
-        "opt_soc": "int",
-        "min_boiler_temp": "int",
-        "opt_boiler_temp": "int",
-        "min_spot_price": "int",
-        "min_grid_charge_soc": "int",
-        "timezone": "str"
-      }
-    }
-  }
+  "name": "Home Energy Optimizer Add-on Repository",
+  "url": "https://github.com/jerry3300/ha-energy-optimizer",
+  "maintainer": "jerry3300"
 }
