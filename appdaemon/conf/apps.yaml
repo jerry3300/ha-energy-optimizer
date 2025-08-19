@@ -1,0 +1,26 @@
+home_energy_optimizer:
+  module: home_energy_optimizer
+  class: HomeEnergyOptimizer
+  optimization_period: 15                # in minutes
+  battery_charge_current: 25             # A
+  min_battery_soc: 80                    # %
+  optimal_battery_soc: 100               # %
+  min_boiler_temp: 55                    # °C
+  optimal_boiler_temp: 70                # °C
+  min_spot_price: 300                    # CZK/MWh
+  battery_entity: sensor.solax_battery_capacity
+  battery_voltage_entity: sensor.solax_battery_voltage_charge
+  battery_charge_control: number.solax_battery_charge_max_current
+  grid_export_control: number.solax_export_control_user_limit
+  boiler_temp_entity: sensor.boiler_temp
+  boiler_relay_1: switch.boiler_relay_1
+  boiler_relay_2: switch.boiler_relay_2
+  solar_power_entity: sensor.solax_pv_power_total
+  house_load_entity: sensor.solax_house_load
+  grid_export_entity: sensor.solax_grid_export
+  grid_import_entity: sensor.solax_grid_import
+  spot_price_entity: sensor.current_spot_electricity_price
+  solcast_forecast_today: sensor.solcast_pv_forecast_forecast_today
+  solcast_forecast_remaining: sensor.solcast_pv_forecast_forecast_remaining_today
+  sunrise_entity: sensor.sun_next_rising
+  sunset_entity: sensor.sun_next_dusk
