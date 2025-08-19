@@ -34,8 +34,5 @@ schema:
 map:
   config: /app/appdaemon/conf
 
-# Do not specify image, as we are building from Dockerfile
-# image: ghcr.io/home-assistant/amd64-addon-base:18
-
-# This add-on does not expose a web UI
+# No image specified - build from Dockerfile
 webui: false
