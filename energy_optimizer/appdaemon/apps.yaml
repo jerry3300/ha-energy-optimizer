@@ -1,0 +1,3 @@
+energy_optimizer:
+  module: energy_optimizer
+  class: EnergyOptimizer
