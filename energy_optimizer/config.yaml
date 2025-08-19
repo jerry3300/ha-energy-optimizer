@@ -1,8 +1,3 @@
-
----
-
-### 3. `energy_optimizer/config.yaml`
-```yaml
 name: Home Energy Optimizer (AppDaemon)
 version: "0.1.0"
 slug: energy_optimizer
@@ -40,16 +35,16 @@ options:
     spot_price: sensor.current_spot_electricity_price
     sun: sun.sun
 schema:
-  slot_minutes: int(5,60)?
-  battery_capacity_kwh: float(1,100)?
-  boiler_liters: int(50,500)?
-  min_soc: int(0,100)?
-  opt_soc: int(0,100)?
-  min_boiler_temp: int(30,80)?
-  opt_boiler_temp: int(30,80)?
-  min_export_price: float(0,10000)?
-  max_grid_import_w: int(0,5000)?
-  battery_charge_current: int(0,25)?
+  slot_minutes: int?
+  battery_capacity_kwh: int?
+  boiler_liters: int?
+  min_soc: int?
+  opt_soc: int?
+  min_boiler_temp: int?
+  opt_boiler_temp: int?
+  min_export_price: int?
+  max_grid_import_w: int?
+  battery_charge_current: int?
   entities:
     battery_soc: str
     grid_import: str
@@ -62,5 +57,3 @@ schema:
     solcast_tomorrow: str
     spot_price: str
     sun: str
-init: false
-image: null
