@@ -1,31 +1,32 @@
-# Use the Home Assistant base image
-ARG BUILD_FROM=ghcr.io/home-assistant/amd64-base:latest
-FROM ${BUILD_FROM}
+# Base image
+FROM python:3.11-slim
 
-# Set environment variables
-ENV LANG C.UTF-8
-ENV PATH="/opt/venv/bin:$PATH"
-
-# Install runtime and build dependencies
-RUN apk add --no-cache \
-        python3 \
-        py3-pip \
-        tzdata \
-        build-base \
-        linux-headers \
-        libffi-dev \
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
         git \
+        curl \
         bash \
-        curl
+        libffi-dev \
+        tzdata && \
+    rm -rf /var/lib/apt/lists/*
 
-# Create a virtual environment and install AppDaemon + pytz
-RUN python3 -m venv /opt/venv \
-    && pip install --upgrade "pip<25.2" \
-    && pip install --no-cache-dir appdaemon==4.4.2 pytz
+# Install AppDaemon and common dependencies
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir appdaemon==4.4.2
 
-# Copy your add-on files (adjust this path if needed)
-COPY run.sh /run.sh
-RUN chmod +x /run.sh
+# Set working directory
+WORKDIR /app
 
-# Set the entrypoint
-CMD [ "/run.sh" ]
+# Copy your project files
+COPY run.sh .
+COPY energy_optimizer/ ./energy_optimizer/
+COPY dashboards/ ./dashboards/
+COPY config.yaml .
+
+# Make script executable
+RUN chmod +x run.sh
+
+# Default command
+CMD ["./run.sh"]
