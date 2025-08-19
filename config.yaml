@@ -1,0 +1,28 @@
+name: "Energy Optimizer"
+version: "1.0.0"
+slug: "energy_optimizer"
+description: "Predictive energy management for optimal self-consumption and grid export."
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+startup: application
+init: false
+# The image field should be commented out or removed if you're building locally from source.
+# If you plan to build and publish a Docker image, uncomment and adjust:
+# image: "your_docker_hub_username/addon-energy-optimizer-{arch}"
+options:
+  appdaemon_url: "http://homeassistant:8123" # Default Home Assistant internal URL
+  timezone: "Europe/Prague" # Set your local timezone for AppDaemon
+schema:
+  appdaemon_url: str
+  timezone: str
+ports: {} # No specific ports needed for this add-on as it communicates internally
+# Mappings to allow AppDaemon to access config and apps
+map:
+  - config: rw
+  - addons: rw # This mapping is crucial for AppDaemon to find its config and apps
+  - share: rw
+  - ssl: rw
